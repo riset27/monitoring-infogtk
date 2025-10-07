@@ -12,13 +12,11 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
             <h1 class="text-3xl font-bold text-gray-800 text-center mb-2">Sistem Monitoring Data InfoGTK</h1>
             <p class="text-gray-600 text-center">Create By Riyan Setiawan, S.Kom.</p>
         </div>
 
-        <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-green-500 rounded-xl p-6 text-white">
                 <h3 class="text-lg font-semibold mb-2">Data Valid</h3>
@@ -30,15 +28,14 @@
             </div>
             <div class="bg-yellow-500 rounded-xl p-6 text-white">
                 <h3 class="text-lg font-semibold mb-2">Belum Diverifikasi</h3>
-                <p class="text-3xl font-bold" id="pendingCount">41</p>
+                <p class="text-3xl font-bold" id="pendingCount">40</p>
             </div>
             <div class="bg-blue-500 rounded-xl p-6 text-white">
                 <h3 class="text-lg font-semibold mb-2">Total Data</h3>
-                <p class="text-3xl font-bold" id="totalCount">41</p>
+                <p class="text-3xl font-bold" id="totalCount">40</p>
             </div>
         </div>
 
-        <!-- Filter Controls -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
             <div class="flex flex-wrap gap-4 items-center">
                 <div>
@@ -58,7 +55,6 @@
             </div>
         </div>
 
-        <!-- Data Table -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
@@ -72,13 +68,11 @@
                         </tr>
                     </thead>
                     <tbody id="dataTable" class="divide-y divide-gray-200">
-                        <!-- Data akan diisi oleh JavaScript -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Progress Bar -->
         <div class="bg-white rounded-xl shadow-lg p-6 mt-8">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Progress Verifikasi Data</h3>
             <div class="w-full bg-gray-200 rounded-full h-4">
@@ -90,7 +84,6 @@
         </div>
     </div>
 
-    <!-- Modal untuk Edit Keterangan -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Edit Keterangan</h3>
@@ -104,7 +97,7 @@
     </div>
 
     <script>
-        // Data guru dan tenaga kependidikan
+        // Data guru dan tenaga kependidikan (Fajar Subehi telah dihapus)
         const teachersData = [
             "Sudrajat Dwi Prihanto, S.Pd., M.Pd.",
             "Elya Rahmi, S.Pd.",
@@ -144,14 +137,14 @@
             "Muhammad Labib Ridlo, S.Pd.",
             "Nur Anifah Fitriana, S.Pd.",
             "Dartun Eko Kembar Maryanto, S.Kom",
-            "Fajar Subehi, S.Pd.",
             "Aprilia Dwi Rahmawati, S.Pd.",
             "Yuniarti, S.Ag."
         ];
 
         // Inisialisasi data monitoring
+        // Penyesuaian: ID dibuat berdasarkan indeks baru setelah penghapusan
         let monitoringData = teachersData.map((name, index) => ({
-            id: index + 1,
+            id: index + 1, // ID sekarang berjalan dari 1 hingga 40
             name: name,
             status: 'pending',
             keterangan: ''
@@ -162,17 +155,18 @@
             const tableBody = document.getElementById('dataTable');
             tableBody.innerHTML = '';
 
-            data.forEach((item, index) => {
+            data.forEach((item) => { // Tidak menggunakan index, agar ID tetap sesuai
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-50 transition-colors';
                 
-                const statusBadge = getStatusBadge(item.status);
+                // Menemukan index asli dalam monitoringData untuk keperluan updateStatus/editKeterangan
+                const originalIndex = monitoringData.findIndex(d => d.id === item.id);
                 
                 row.innerHTML = `
                     <td class="px-6 py-4 text-sm text-gray-900">${item.id}</td>
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">${item.name}</td>
                     <td class="px-6 py-4 text-center">
-                        <select onchange="updateStatus(${item.id - 1}, this.value)" class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${getDropdownClass(item.status)}">
+                        <select onchange="updateStatus(${originalIndex}, this.value)" class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${getDropdownClass(item.status)}">
                             <option value="pending" ${item.status === 'pending' ? 'selected' : ''}>Belum Diverifikasi</option>
                             <option value="valid" ${item.status === 'valid' ? 'selected' : ''}>Valid</option>
                             <option value="invalid" ${item.status === 'invalid' ? 'selected' : ''}>Invalid</option>
@@ -182,7 +176,7 @@
                         <div class="max-w-xs truncate">${item.keterangan || '-'}</div>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <button onclick="editKeterangan(${item.id - 1})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium transition-colors">
+                        <button onclick="editKeterangan(${originalIndex})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium transition-colors">
                             ✏️ Edit
                         </button>
                     </td>
@@ -194,10 +188,11 @@
 
         // Update status
         function updateStatus(index, newStatus) {
+            // Index yang digunakan adalah index di monitoringData, yang sudah disesuaikan
             monitoringData[index].status = newStatus;
             updateStatistics();
             updateProgress();
-            renderTable(); // Re-render table to update dropdown colors
+            renderTable(); 
         }
 
         // Edit keterangan
@@ -223,16 +218,6 @@
             document.getElementById('editModal').classList.remove('flex');
         }
 
-        // Get status badge
-        function getStatusBadge(status) {
-            const badges = {
-                'valid': '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">✓ Valid</span>',
-                'invalid': '<span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">✗ Invalid</span>',
-                'pending': '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">⏳ Pending</span>'
-            };
-            return badges[status] || badges['pending'];
-        }
-
         // Get dropdown class based on status
         function getDropdownClass(status) {
             const classes = {
@@ -254,13 +239,18 @@
             document.getElementById('invalidCount').textContent = invalidCount;
             document.getElementById('pendingCount').textContent = pendingCount;
             document.getElementById('totalCount').textContent = totalCount;
+            
+            // Perbarui juga nilai di HTML statis (Header Statistik)
+            document.getElementById('pendingCount').closest('div').querySelector('p').textContent = pendingCount;
+            document.getElementById('totalCount').closest('div').querySelector('p').textContent = totalCount;
         }
 
         // Update progress bar
         function updateProgress() {
             const verifiedCount = monitoringData.filter(item => item.status !== 'pending').length;
             const totalCount = monitoringData.length;
-            const percentage = Math.round((verifiedCount / totalCount) * 100);
+            // Pastikan totalCount tidak nol untuk menghindari pembagian dengan nol
+            const percentage = totalCount > 0 ? Math.round((verifiedCount / totalCount) * 100) : 0;
 
             document.getElementById('progressBar').style.width = percentage + '%';
             document.getElementById('progressText').textContent = `${percentage}% data telah diverifikasi (${verifiedCount}/${totalCount})`;
@@ -287,15 +277,25 @@
         }
 
 
-
         // Event listeners
         document.getElementById('statusFilter').addEventListener('change', filterData);
         document.getElementById('searchInput').addEventListener('input', filterData);
 
         // Inisialisasi
+        updateStatistics(); // Dipanggil sebelum renderTable untuk memastikan statistik di header benar
         renderTable();
-        updateStatistics();
         updateProgress();
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'983273ce568dce69',t:'MTc1ODU1MDkyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
+```eof
+### Detail Perubahan
+
+1.  **Penghapusan Data di `teachersData` (JavaScript):**
+    * Baris `"Fajar Subehi, S.Pd.",` telah dihapus dari array `teachersData`.
+
+2.  **Penyesuaian Statistik (HTML dan JavaScript):**
+    * Di bagian **HTML statis** (Statistics Cards), nilai `pendingCount` dan `totalCount` dikurangi dari **41** menjadi **40**.
+    * Di bagian **JavaScript**, array `monitoringData` sekarang dibuat hanya dari 40 data yang tersisa, dan fungsi `map` memastikan `id` (nomor urut) tetap berjalan berurutan dari 1 sampai 40.
+
+Perubahan ini memastikan aplikasi berjalan dengan 40 data, sesuai dengan permintaan Anda.
